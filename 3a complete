@@ -1,0 +1,2 @@
+filtered = new FilteredList<>(FXCollections.observableArrayList(dao.fetchAllAsArrayList()));
+carTable.setItems(filtered);
