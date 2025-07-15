@@ -1,0 +1,19 @@
+
+ * Returns a list of distinct years in which a car was sold (e.g., 2022, 2021, 2020).
+ */
+public ArrayList<Integer> fetchDistinctSaleYears() {
+    ArrayList<Integer> years = new ArrayList<>();
+    String sql = "SELECT DISTINCT YEAR(dateSold) AS yr FROM carSales ORDER BY yr DESC";
+
+    try (Connection conn = DBUtil.getConnection();
+         Statement st   = conn.createStatement();
+         ResultSet rs   = st.executeQuery(sql)) {
+
+        while (rs.next()) {
+            years.add(rs.getInt("yr"));
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return years;
+}
