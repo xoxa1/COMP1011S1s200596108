@@ -1,0 +1,49 @@
+package com.student.model.controller;
+
+import com.student.model.CarSaleDAO;
+import com.student.model.Car;
+import javafx.collections.FXCollections;
+import javafx.collections.transformation.FilteredList;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+
+public class MainController {
+
+    @FXML private TableView<Car>       carTable;
+    @FXML private TableColumn<Car, ?>  idCol, yearCol, makeCol, modelCol, priceCol, dateCol;
+    @FXML private ListView<Integer>    yearList;
+
+    private final CarSaleDAO dao = new CarSaleDAO();
+    private FilteredList<Car> filtered;
+
+    @FXML
+    private void initialize() {
+        // Simple PropertyValueFactory bindings
+        idCol.setCellValueFactory(c -> new javafx.beans.property.SimpleIntegerProperty(c.getValue().getCarID()).asObject());
+        yearCol.setCellValueFactory(c -> new javafx.beans.property.SimpleIntegerProperty(c.getValue().getModelYear()).asObject());
+        makeCol.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getMake()));
+        modelCol.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getModel()));
+        priceCol.setCellValueFactory(c -> new javafx.beans.property.SimpleIntegerProperty(c.getValue().getPrice()).asObject());
+        dateCol.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getDateSold()));
+
+        // Load cars
+        filtered = new FilteredList<>(FXCollections.observableArrayList(dao.fetchAllAsArrayList()));
+        carTable.setItems(filtered);
+
+        // Load years
+        yearList.setItems(FXCollections.observableArrayList(dao.fetchDistinctSaleYears()));
+        yearList.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) ->
+                applyYearFilter(newV));
+    }
+
+    private void applyYearFilter(Integer year) {
+        if (year == null) return;
+        filtered.setPredicate(car -> car.getDateSold().getYear() == year);
+    }
+
+    @FXML
+    private void handleClearFilter() {
+        yearList.getSelectionModel().clearSelection();
+        filtered.setPredicate(null);
+    }
+}
