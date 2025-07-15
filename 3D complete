@@ -1,0 +1,71 @@
+package com.student.controller;
+
+import com.student.dao.CarSaleDAO;
+import com.student.model.Car;
+import javafx.collections.FXCollections;
+import javafx.collections.transformation.FilteredList;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+
+import java.text.NumberFormat;
+
+public class MainController {
+
+    @FXML private TableView<Car> carTable;
+    @FXML private TableColumn<Car, ?> idCol, yearCol, makeCol, modelCol, priceCol, dateCol;
+    @FXML private ComboBox<Integer> yearComboBox;
+
+    @FXML private Label totalCarsLabel;
+    @FXML private Label totalSalesLabel;
+
+    private final CarSaleDAO dao = new CarSaleDAO();
+    private FilteredList<Car> filtered;
+
+    @FXML
+    private void initialize() {
+        // Bind table columns to Car properties
+        idCol.setCellValueFactory(c -> new javafx.beans.property.SimpleIntegerProperty(c.getValue().getCarID()).asObject());
+        yearCol.setCellValueFactory(c -> new javafx.beans.property.SimpleIntegerProperty(c.getValue().getModelYear()).asObject());
+        makeCol.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getMake()));
+        modelCol.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getModel()));
+        priceCol.setCellValueFactory(c -> new javafx.beans.property.SimpleIntegerProperty(c.getValue().getPrice()).asObject());
+        dateCol.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getDateSold()));
+
+        // Load cars from DB and apply to TableView
+        filtered = new FilteredList<>(FXCollections.observableArrayList(dao.fetchAllAsArrayList()));
+        carTable.setItems(filtered);
+
+        // Populate ComboBox with distinct years
+        yearComboBox.setItems(FXCollections.observableArrayList(dao.fetchDistinctSaleYears()));
+
+        // Display initial totals
+        refreshStats();
+    }
+
+    @FXML
+    private void handleYearSelection() {
+        Integer selectedYear = yearComboBox.getValue();
+        if (selectedYear != null) {
+            filtered.setPredicate(car -> car.getDateSold().getYear() == selectedYear);
+            refreshStats();
+        }
+    }
+
+    @FXML
+    private void handleClearFilter() {
+        yearComboBox.getSelectionModel().clearSelection();
+        filtered.setPredicate(null);
+        refreshStats();
+    }
+
+    // Updates stats labels (total cars, total sales with currency)
+    private void refreshStats() {
+        int totalCars = filtered.size();
+        int totalPrice = filtered.stream().mapToInt(Car::getPrice).sum();
+
+        totalCarsLabel.setText(String.valueOf(totalCars));
+
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
+        totalSalesLabel.setText(currencyFormat.format(totalPrice));
+    }
+}
