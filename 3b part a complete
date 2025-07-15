@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            prefWidth="1000" prefHeight="800"
+            fx:controller="com.student.controller.MainController">
+
+    <!-- Top bar -->
+    <top>
+        <HBox spacing="10" styleClass="title-bar">
+            <children>
+                <Label text="Car Sales Dashboard" styleClass="title"/>
+            </children>
+            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+        </HBox>
+    </top>
+
+    <!-- Center table -->
+    <center>
+        <TableView fx:id="carTable">
+            <columns>
+                <TableColumn fx:id="idCol"    text="ID"        prefWidth="60"/>
+                <TableColumn fx:id="yearCol"  text="Year"      prefWidth="80"/>
+                <TableColumn fx:id="makeCol"  text="Make"      prefWidth="120"/>
+                <TableColumn fx:id="modelCol" text="Model"     prefWidth="140"/>
+                <TableColumn fx:id="priceCol" text="Price"     prefWidth="100"/>
+                <TableColumn fx:id="dateCol"  text="Sold On"   prefWidth="140"/>
+            </columns>
+        </TableView>
+    </center>
+
+    <!-- Right sidebar -->
+    <right>
+        <VBox spacing="8" styleClass="sidebar">
+            <children>
+                <Label text="Filter by Year"/>
+                <ComboBox fx:id="yearComboBox" prefWidth="150" onAction="#handleYearSelection"/>
+                <Button text="Clear Filter" onAction="#handleClearFilter"/>
+            </children>
+            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+        </VBox>
+    </right>
+</BorderPane>
